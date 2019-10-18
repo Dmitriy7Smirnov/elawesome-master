@@ -15,8 +15,20 @@ defmodule Elawesome.Mixfile do
   # Configuration for the OTP application
   def application do
     [
-      applications: [:logger, :cowboy, :plug, :phoenix, :earmark],
+      applications: get_apps(),
       mod: {Elawesome, []}
+    ]
+  end
+
+  defp get_apps do
+    [
+      :inets,
+      :ssl,
+      :logger,
+      :cowboy,
+      :plug,
+      :phoenix,
+      :earmark
     ]
   end
 
@@ -27,6 +39,7 @@ defmodule Elawesome.Mixfile do
       {:phoenix, "~> 1.4"},
       {:plug_cowboy, "~> 1.0"},
       {:jason, "~> 1.1"},
+      {:floki, "~> 0.23.0"},
       {:earmark, "~> 1.4"}
     ]
   end

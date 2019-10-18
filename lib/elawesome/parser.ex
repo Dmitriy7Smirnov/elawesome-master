@@ -2,10 +2,7 @@ defmodule Parser do
 
 
   def get_content do
-    :inets.start()
-    :ssl.start()
     {:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {'https://raw.githubusercontent.com/h4cc/awesome-elixir/master/README.md', []}, [], [])
-    :inets.stop()
     #{:ok, mp} = :re.compile("basic")
     #{_body, answer} = :re.inspect(mp, :erlang.list_to_binary(body))
     #nswer
@@ -17,11 +14,8 @@ defmodule Parser do
   end
 
   def get_stars do
-    :inets.start()
-    :ssl.start()
     url = 'https://github.com/rozap/exquery'
     {:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {url, []}, [], [])
-    :inets.stop()
     #str = "aria-label=\"31 users starred this repository\">"
     starsStr = case Regex.run(~r/(".* users starred this repository">)/, :erlang.list_to_binary(body)) do
       [ _, starsStr] -> starsStr
@@ -34,12 +28,24 @@ defmodule Parser do
     stars
   end
 
+  def gsf do
+    url = 'https://github.com/rozap/exquery'
+    {:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {url, []}, [], [{:body_format, :binary}])
+    numAsText = Floki.find(body, "a.social-count.js-social-count") |> Floki.text
+    get_number_from_text(numAsText)
+  end
+
+  defp get_number_from_text(text) do
+    stars = case Regex.run(~r/(\d+)/, text) do
+              [ _, stars] -> stars
+              _ -> false
+            end
+    stars
+  end
+
   def get_time do
-    :inets.start()
-    :ssl.start()
     url = 'https://github.com/rozap/exquery'
     {:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {url, []}, [], [])
-    :inets.stop()
     #str = "aria-label=\"31 users starred this repository\">"
     dates = Regex.scan(~r/(><time-ago datetime="\d{4}-\d{2}-\d{2}T)/, :erlang.list_to_binary(body))
     dates1 = for [el1, _el2] <- dates do
